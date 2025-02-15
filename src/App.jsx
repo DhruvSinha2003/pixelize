@@ -18,32 +18,35 @@ class PixelArt {
     // Draw original image
     this.ctx.drawImage(image, 0, 0);
 
-    // Pixelate
-    const scaledW = this.canvas.width * this.scale;
-    const scaledH = this.canvas.height * this.scale;
+    // Pixelate only if scale is less than 1
+    if (this.scale < 1) {
+      // Calculate scaled dimensions
+      const scaledW = this.canvas.width * this.scale;
+      const scaledH = this.canvas.height * this.scale;
 
-    // Create temporary canvas for pixelation
-    const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = this.canvas.width;
-    tempCanvas.height = this.canvas.height;
-    const tempCtx = tempCanvas.getContext("2d");
+      // Create temporary canvas for pixelation
+      const tempCanvas = document.createElement("canvas");
+      tempCanvas.width = this.canvas.width;
+      tempCanvas.height = this.canvas.height;
+      const tempCtx = tempCanvas.getContext("2d");
 
-    // Draw scaled down version
-    tempCtx.drawImage(image, 0, 0, scaledW, scaledH);
+      // Draw scaled down version
+      tempCtx.drawImage(image, 0, 0, scaledW, scaledH);
 
-    // Draw scaled up version
-    this.ctx.imageSmoothingEnabled = false;
-    this.ctx.drawImage(
-      tempCanvas,
-      0,
-      0,
-      scaledW,
-      scaledH,
-      0,
-      0,
-      this.canvas.width,
-      this.canvas.height
-    );
+      // Draw scaled up version
+      this.ctx.imageSmoothingEnabled = false;
+      this.ctx.drawImage(
+        tempCanvas,
+        0,
+        0,
+        scaledW,
+        scaledH,
+        0,
+        0,
+        this.canvas.width,
+        this.canvas.height
+      );
+    }
 
     // Apply color palette
     const imageData = this.ctx.getImageData(
@@ -289,7 +292,7 @@ const PixelArtConverter = () => {
               <input
                 type="range"
                 min="0.01"
-                max="0.5"
+                max="1"
                 step="0.01"
                 value={scale}
                 onChange={handleScaleChange}
