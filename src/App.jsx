@@ -319,22 +319,24 @@ const PixelArtConverter = () => {
               </select>
             </div>
           </div>
-
-          <div className="mt-6">
-            <canvas
-              ref={canvasRef}
-              className="max-w-full border border-gray-600 rounded-lg bg-gray-700"
-            />
-          </div>
           {image && (
-            <div className="mt-4">
-              <button
-                onClick={handleSaveImage}
-                className="flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-lg shadow-md hover:bg-purple-700 transition-colors duration-200"
-              >
-                <Download className="w-5 h-5 mr-2" />
-                Save Image
-              </button>
+            <div>
+              <div className="mt-6">
+                <canvas
+                  ref={canvasRef}
+                  className="max-w-full border border-gray-600 rounded-lg bg-gray-700"
+                />
+              </div>
+
+              <div className="mt-4">
+                <button
+                  onClick={handleSaveImage}
+                  className="flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-lg shadow-md hover:bg-purple-700 transition-colors duration-200"
+                >
+                  <Download className="w-5 h-5 mr-2" />
+                  Save Image
+                </button>
+              </div>
             </div>
           )}
         </div>
