@@ -244,7 +244,7 @@ const PixelArtConverter = () => {
       <div className="max-w-4xl mx-auto p-6 space-y-6">
         <div className="bg-gray-800 rounded-lg shadow-xl p-6">
           <h1 className="text-3xl font-bold mb-6 text-center text-purple-400">
-            Pixel Art Converter
+            Pixelize
           </h1>
 
           <div className="space-y-6">
