@@ -1,4 +1,4 @@
-import { Upload } from "lucide-react";
+import { Download, Image as ImageIcon, Upload } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 // Simplified pixelation class
@@ -7,16 +7,7 @@ class PixelArt {
     this.canvas = config.canvas;
     this.ctx = this.canvas.getContext("2d");
     this.scale = config.scale || 0.08;
-    this.palette = config.palette || [
-      [140, 143, 174],
-      [88, 69, 99],
-      [62, 33, 55],
-      [154, 99, 72],
-      [215, 155, 125],
-      [245, 237, 186],
-      [192, 199, 65],
-      [100, 125, 52],
-    ];
+    this.palette = config.palette || colorPalettes.default;
   }
 
   async process(image) {
@@ -124,12 +115,41 @@ const colorPalettes = {
     [255, 145, 145],
     [255, 195, 195],
   ],
+  cyberpunk: [
+    [20, 20, 40],
+    [40, 10, 80],
+    [150, 20, 255],
+    [0, 255, 255],
+    [255, 0, 128],
+  ],
+  forest: [
+    [12, 32, 14],
+    [48, 96, 48],
+    [91, 135, 72],
+    [138, 176, 99],
+    [166, 209, 119],
+  ],
+  ocean: [
+    [0, 30, 50],
+    [0, 60, 110],
+    [0, 90, 170],
+    [0, 120, 230],
+    [100, 200, 255],
+  ],
+  retro: [
+    [34, 34, 34],
+    [85, 85, 85],
+    [136, 136, 136],
+    [187, 187, 187],
+    [238, 238, 238],
+  ],
 };
 
 const PixelArtConverter = () => {
   const [image, setImage] = useState(null);
   const [scale, setScale] = useState(0.08);
   const [selectedPalette, setSelectedPalette] = useState("default");
+  const [isDragging, setIsDragging] = useState(false);
   const canvasRef = useRef(null);
   const pixelArtRef = useRef(null);
 
@@ -160,8 +180,35 @@ const PixelArtConverter = () => {
     }
   };
 
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          setImage(img);
+          processImage(img);
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const processImage = async (img) => {
-    if (pixelArtRef.current) {
+    if (img && pixelArtRef.current) {
       pixelArtRef.current.setScale(scale);
       pixelArtRef.current.setPalette(colorPalettes[selectedPalette]);
       await pixelArtRef.current.process(img);
@@ -193,70 +240,100 @@ const PixelArtConverter = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h1 className="text-2xl font-bold mb-4">Pixel Art Converter</h1>
+    <div className="min-h-screen bg-gray-900 text-gray-100">
+      <div className="max-w-4xl mx-auto p-6 space-y-6">
+        <div className="bg-gray-800 rounded-lg shadow-xl p-6">
+          <h1 className="text-3xl font-bold mb-6 text-center text-purple-400">
+            Pixel Art Converter
+          </h1>
 
-        <div className="space-y-4">
-          <div className="flex items-center justify-center w-full">
-            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-              <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                <Upload className="w-8 h-8 mb-2 text-gray-500" />
-                <p className="mb-2 text-sm text-gray-500">
-                  <span className="font-semibold">Click to upload</span> or drag
-                  and drop
-                </p>
-              </div>
+          <div className="space-y-6">
+            <div
+              className="flex items-center justify-center w-full"
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              <label
+                className={`flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-lg cursor-pointer ${
+                  isDragging
+                    ? "border-purple-500 bg-gray-700"
+                    : "border-gray-600 bg-gray-700 hover:bg-gray-600"
+                }`}
+              >
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  {image ? (
+                    <ImageIcon className="w-10 h-10 mb-3 text-purple-400" />
+                  ) : (
+                    <Upload className="w-10 h-10 mb-3 text-purple-400" />
+                  )}
+                  <p className="mb-2 text-sm text-gray-300">
+                    <span className="font-semibold">Click to upload</span> or
+                    drag and drop
+                  </p>
+                  <p className="text-xs text-gray-400">PNG, JPG, or GIF</p>
+                </div>
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                />
+              </label>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-300">
+                Pixel Scale: {(scale * 100).toFixed(1)}%
+              </label>
               <input
-                type="file"
-                className="hidden"
-                accept="image/*"
-                onChange={handleImageUpload}
+                type="range"
+                min="0.01"
+                max="0.5"
+                step="0.01"
+                value={scale}
+                onChange={handleScaleChange}
+                className="w-full accent-purple-500"
               />
-            </label>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-300">
+                Color Palette
+              </label>
+              <select
+                value={selectedPalette}
+                onChange={handlePaletteChange}
+                className="block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-gray-200"
+              >
+                <option value="default">Default</option>
+                <option value="grayscale">Grayscale</option>
+                <option value="sunset">Sunset</option>
+                <option value="cyberpunk">Cyberpunk</option>
+                <option value="forest">Forest</option>
+                <option value="ocean">Ocean</option>
+                <option value="retro">Retro</option>
+              </select>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Pixel Scale: {(scale * 100).toFixed(1)}%
-            </label>
-            <input
-              type="range"
-              min="0.01"
-              max="0.5"
-              step="0.01"
-              value={scale}
-              onChange={handleScaleChange}
-              className="w-full"
+          <div className="mt-6">
+            <canvas
+              ref={canvasRef}
+              className="max-w-full border border-gray-600 rounded-lg bg-gray-700"
             />
           </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Color Palette
-            </label>
-            <select
-              value={selectedPalette}
-              onChange={handlePaletteChange}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            >
-              <option value="default">Default</option>
-              <option value="grayscale">Grayscale</option>
-              <option value="sunset">Sunset</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="mt-6">
-          <canvas ref={canvasRef} className="max-w-full border rounded-lg" />
-        </div>
-        <div className="mt-4">
-          <button
-            onClick={handleSaveImage}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600"
-          >
-            Save Image
-          </button>
+          {image && (
+            <div className="mt-4">
+              <button
+                onClick={handleSaveImage}
+                className="flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-lg shadow-md hover:bg-purple-700 transition-colors duration-200"
+              >
+                <Download className="w-5 h-5 mr-2" />
+                Save Image
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
