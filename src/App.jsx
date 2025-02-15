@@ -1,7 +1,7 @@
 import { Download, Image as ImageIcon, Upload } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import colorPalettes from "./colorPalettes";
 
-// Simplified pixelation class
 class PixelArt {
   constructor(config = {}) {
     this.canvas = config.canvas;
@@ -11,29 +11,22 @@ class PixelArt {
   }
 
   async process(image) {
-    // Set canvas size
     this.canvas.width = image.width;
     this.canvas.height = image.height;
 
-    // Draw original image
     this.ctx.drawImage(image, 0, 0);
 
-    // Pixelate only if scale is less than 1
     if (this.scale < 1) {
-      // Calculate scaled dimensions
       const scaledW = this.canvas.width * this.scale;
       const scaledH = this.canvas.height * this.scale;
 
-      // Create temporary canvas for pixelation
       const tempCanvas = document.createElement("canvas");
       tempCanvas.width = this.canvas.width;
       tempCanvas.height = this.canvas.height;
       const tempCtx = tempCanvas.getContext("2d");
 
-      // Draw scaled down version
       tempCtx.drawImage(image, 0, 0, scaledW, scaledH);
 
-      // Draw scaled up version
       this.ctx.imageSmoothingEnabled = false;
       this.ctx.drawImage(
         tempCanvas,
@@ -48,7 +41,6 @@ class PixelArt {
       );
     }
 
-    // Apply color palette
     const imageData = this.ctx.getImageData(
       0,
       0,
@@ -92,61 +84,6 @@ class PixelArt {
     this.palette = palette;
   }
 }
-
-const colorPalettes = {
-  default: [
-    [140, 143, 174],
-    [88, 69, 99],
-    [62, 33, 55],
-    [154, 99, 72],
-    [215, 155, 125],
-    [245, 237, 186],
-    [192, 199, 65],
-    [100, 125, 52],
-  ],
-  grayscale: [
-    [0, 0, 0],
-    [64, 64, 64],
-    [128, 128, 128],
-    [192, 192, 192],
-    [255, 255, 255],
-  ],
-  sunset: [
-    [45, 45, 45],
-    [125, 45, 45],
-    [195, 95, 95],
-    [255, 145, 145],
-    [255, 195, 195],
-  ],
-  cyberpunk: [
-    [20, 20, 40],
-    [40, 10, 80],
-    [150, 20, 255],
-    [0, 255, 255],
-    [255, 0, 128],
-  ],
-  forest: [
-    [12, 32, 14],
-    [48, 96, 48],
-    [91, 135, 72],
-    [138, 176, 99],
-    [166, 209, 119],
-  ],
-  ocean: [
-    [0, 30, 50],
-    [0, 60, 110],
-    [0, 90, 170],
-    [0, 120, 230],
-    [100, 200, 255],
-  ],
-  retro: [
-    [34, 34, 34],
-    [85, 85, 85],
-    [136, 136, 136],
-    [187, 187, 187],
-    [238, 238, 238],
-  ],
-};
 
 const PixelArtConverter = () => {
   const [image, setImage] = useState(null);
