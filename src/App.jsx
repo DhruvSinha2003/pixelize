@@ -141,7 +141,8 @@ const PixelArtConverter = () => {
         palette: colorPalettes[selectedPalette],
       });
     }
-  }, []);
+    processImage(image);
+  }, [selectedPalette, scale, image]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -179,6 +180,15 @@ const PixelArtConverter = () => {
     setSelectedPalette(e.target.value);
     if (image) {
       processImage(image);
+    }
+  };
+
+  const handleSaveImage = () => {
+    if (canvasRef.current) {
+      const link = document.createElement("a");
+      link.href = canvasRef.current.toDataURL("image/png");
+      link.download = "pixelated-image.png";
+      link.click();
     }
   };
 
@@ -239,6 +249,14 @@ const PixelArtConverter = () => {
 
         <div className="mt-6">
           <canvas ref={canvasRef} className="max-w-full border rounded-lg" />
+        </div>
+        <div className="mt-4">
+          <button
+            onClick={handleSaveImage}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600"
+          >
+            Save Image
+          </button>
         </div>
       </div>
     </div>
