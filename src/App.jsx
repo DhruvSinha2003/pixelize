@@ -246,13 +246,11 @@ const PixelArtConverter = () => {
                 onChange={handlePaletteChange}
                 className="block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-gray-200"
               >
-                <option value="default">Default</option>
-                <option value="grayscale">Grayscale</option>
-                <option value="sunset">Sunset</option>
-                <option value="cyberpunk">Cyberpunk</option>
-                <option value="forest">Forest</option>
-                <option value="ocean">Ocean</option>
-                <option value="retro">Retro</option>
+                {Object.keys(colorPalettes).map((palette) => (
+                  <option key={palette} value={palette}>
+                    {palette.charAt(0).toUpperCase() + palette.slice(1)}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
