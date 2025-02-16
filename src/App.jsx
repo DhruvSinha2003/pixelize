@@ -1,6 +1,6 @@
 import { Download, Image as ImageIcon, Upload } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import colorPalettes from "./colorPalettes";
+import colorPalettes from "./palettes";
 
 class PixelArt {
   constructor(config = {}) {

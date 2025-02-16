@@ -1,4 +1,4 @@
-export const colorPalettes = {
+const colorPalettes = {
   default: [
     [140, 143, 174],
     [88, 69, 99],
@@ -52,3 +52,5 @@ export const colorPalettes = {
     [238, 238, 238],
   ],
 };
+
+export default colorPalettes;
