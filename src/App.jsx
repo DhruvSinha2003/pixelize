@@ -1,6 +1,7 @@
 import { Download, Image as ImageIcon, Upload } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import colorPalettes from "./palettes";
+import themes from "./themes";
 
 class PixelArt {
   constructor(config = {}) {
@@ -92,6 +93,7 @@ const PixelArtConverter = () => {
   const [isDragging, setIsDragging] = useState(false);
   const canvasRef = useRef(null);
   const pixelArtRef = useRef(null);
+  const currentTheme = themes[selectedPalette];
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -118,6 +120,45 @@ const PixelArtConverter = () => {
       };
       reader.readAsDataURL(file);
     }
+  };
+  const styles = {
+    container: {
+      backgroundColor: currentTheme.background,
+      color: currentTheme.text,
+    },
+    card: {
+      backgroundColor: `rgba(${currentTheme.primary
+        .match(/\d+/g)
+        .map((n) => Math.min(parseInt(n) + 20, 255))
+        .join(", ")}, 0.1)`,
+      borderColor: currentTheme.border,
+    },
+    title: {
+      color: currentTheme.accent,
+    },
+    uploadArea: {
+      borderColor: isDragging ? currentTheme.accent : currentTheme.border,
+      backgroundColor: `rgba(${currentTheme.primary
+        .match(/\d+/g)
+        .join(", ")}, 0.1)`,
+    },
+    button: {
+      backgroundColor: currentTheme.accent,
+      color: currentTheme.text,
+    },
+    select: {
+      backgroundColor: `rgba(${currentTheme.primary
+        .match(/\d+/g)
+        .join(", ")}, 0.2)`,
+      borderColor: currentTheme.border,
+      color: currentTheme.text,
+    },
+    canvas: {
+      borderColor: currentTheme.border,
+      backgroundColor: `rgba(${currentTheme.primary
+        .match(/\d+/g)
+        .join(", ")}, 0.1)`,
+    },
   };
 
   const handleDragOver = (e) => {
@@ -180,10 +221,13 @@ const PixelArtConverter = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100">
+    <div className="min-h-screen" style={styles.container}>
       <div className="max-w-4xl mx-auto p-6 space-y-6">
-        <div className="bg-gray-800 rounded-lg shadow-xl p-6">
-          <h1 className="text-3xl font-bold mb-6 text-center text-purple-400">
+        <div className="rounded-lg shadow-xl p-6" style={styles.card}>
+          <h1
+            className="text-3xl font-bold mb-6 text-center"
+            style={styles.title}
+          >
             Pixelize
           </h1>
 
@@ -195,23 +239,26 @@ const PixelArtConverter = () => {
               onDrop={handleDrop}
             >
               <label
-                className={`flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-lg cursor-pointer ${
-                  isDragging
-                    ? "border-purple-500 bg-gray-700"
-                    : "border-gray-600 bg-gray-700 hover:bg-gray-600"
-                }`}
+                className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-lg cursor-pointer transition-colors duration-200"
+                style={styles.uploadArea}
               >
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                   {image ? (
-                    <ImageIcon className="w-10 h-10 mb-3 text-purple-400" />
+                    <ImageIcon
+                      className="w-10 h-10 mb-3"
+                      style={{ color: currentTheme.accent }}
+                    />
                   ) : (
-                    <Upload className="w-10 h-10 mb-3 text-purple-400" />
+                    <Upload
+                      className="w-10 h-10 mb-3"
+                      style={{ color: currentTheme.accent }}
+                    />
                   )}
-                  <p className="mb-2 text-sm text-gray-300">
+                  <p className="mb-2 text-sm">
                     <span className="font-semibold">Click to upload</span> or
                     drag and drop
                   </p>
-                  <p className="text-xs text-gray-400">PNG, JPG, WEBP</p>
+                  <p className="text-xs opacity-70">PNG, JPG, WEBP</p>
                 </div>
                 <input
                   type="file"
@@ -223,7 +270,7 @@ const PixelArtConverter = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-300">
+              <label className="block text-sm font-medium">
                 Pixel Scale: {(scale * 100).toFixed(1)}%
               </label>
               <input
@@ -233,18 +280,18 @@ const PixelArtConverter = () => {
                 step="0.01"
                 value={scale}
                 onChange={handleScaleChange}
-                className="w-full accent-purple-500"
+                className="w-full"
+                style={{ accentColor: currentTheme.accent }}
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-300">
-                Color Palette
-              </label>
+              <label className="block text-sm font-medium">Color Palette</label>
               <select
                 value={selectedPalette}
                 onChange={handlePaletteChange}
-                className="block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 text-gray-200"
+                className="block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none"
+                style={styles.select}
               >
                 {Object.keys(colorPalettes).map((palette) => (
                   <option key={palette} value={palette}>
@@ -254,19 +301,22 @@ const PixelArtConverter = () => {
               </select>
             </div>
           </div>
+
           {image && (
             <div>
               <div className="mt-6">
                 <canvas
                   ref={canvasRef}
-                  className="max-w-full border border-gray-600 rounded-lg bg-gray-700"
+                  className="max-w-full border rounded-lg"
+                  style={styles.canvas}
                 />
               </div>
 
               <div className="mt-4">
                 <button
                   onClick={handleSaveImage}
-                  className="flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-lg shadow-md hover:bg-purple-700 transition-colors duration-200"
+                  className="flex items-center justify-center px-4 py-2 rounded-lg shadow-md transition-colors duration-200"
+                  style={styles.button}
                 >
                   <Download className="w-5 h-5 mr-2" />
                   Save Image
