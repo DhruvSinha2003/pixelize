@@ -87,7 +87,7 @@ class PixelArt {
 
 const PixelArtConverter = () => {
   const [image, setImage] = useState(null);
-  const [scale, setScale] = useState(0.08);
+  const [scale, setScale] = useState(0.5);
   const [selectedPalette, setSelectedPalette] = useState("default");
   const [isDragging, setIsDragging] = useState(false);
   const canvasRef = useRef(null);
@@ -211,12 +211,12 @@ const PixelArtConverter = () => {
                     <span className="font-semibold">Click to upload</span> or
                     drag and drop
                   </p>
-                  <p className="text-xs text-gray-400">PNG, JPG, or GIF</p>
+                  <p className="text-xs text-gray-400">PNG, JPG, WEBP</p>
                 </div>
                 <input
                   type="file"
                   className="hidden"
-                  accept="image/*"
+                  accept="image/png, image/jpeg, image/webp"
                   onChange={handleImageUpload}
                 />
               </label>
