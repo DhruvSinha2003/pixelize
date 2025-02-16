@@ -1,6 +1,7 @@
 import { Download, Image as ImageIcon, Upload } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import colorPalettes from "./palettes";
+import StyledSelect from "./StyledSelect";
 import themes from "./themes";
 
 class PixelArt {
@@ -93,7 +94,77 @@ const PixelArtConverter = () => {
   const [isDragging, setIsDragging] = useState(false);
   const canvasRef = useRef(null);
   const pixelArtRef = useRef(null);
+
   const currentTheme = themes[selectedPalette];
+
+  const styles = {
+    container: {
+      backgroundColor: currentTheme.background,
+      color: currentTheme.textPrimary,
+      minHeight: "100vh",
+    },
+    card: {
+      backgroundColor: currentTheme.surfaceLight,
+      borderColor: currentTheme.borderMedium,
+      boxShadow: `0 4px 6px -1px ${currentTheme.surfaceDark}`,
+    },
+    uploadArea: {
+      borderColor: isDragging
+        ? currentTheme.borderAccent
+        : currentTheme.borderLight,
+      backgroundColor: currentTheme.surfaceMedium,
+      transition: "all 0.2s ease",
+      "&:hover": {
+        borderColor: currentTheme.borderAccent,
+        backgroundColor: currentTheme.surfaceDark,
+      },
+    },
+    icon: {
+      color: currentTheme.textAccent,
+    },
+    text: {
+      primary: {
+        color: currentTheme.textPrimary,
+      },
+      secondary: {
+        color: currentTheme.textSecondary,
+      },
+    },
+    button: {
+      backgroundColor: currentTheme.buttonBg,
+      color: currentTheme.textPrimary,
+      transition: "all 0.2s ease",
+      "&:hover": {
+        backgroundColor: currentTheme.buttonHover,
+      },
+      "&:active": {
+        backgroundColor: currentTheme.buttonActive,
+      },
+    },
+    select: {
+      backgroundColor: currentTheme.surfaceMedium,
+      borderColor: currentTheme.borderLight,
+      color: currentTheme.textPrimary,
+      "& option": {
+        backgroundColor: currentTheme.optionBg,
+        color: currentTheme.optionText,
+      },
+      "&:hover": {
+        borderColor: currentTheme.borderAccent,
+      },
+      "&:focus": {
+        borderColor: currentTheme.borderAccent,
+        outline: "none",
+      },
+    },
+    canvas: {
+      borderColor: currentTheme.borderMedium,
+      backgroundColor: currentTheme.surfaceLight,
+    },
+    slider: {
+      accentColor: currentTheme.accent,
+    },
+  };
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -120,45 +191,6 @@ const PixelArtConverter = () => {
       };
       reader.readAsDataURL(file);
     }
-  };
-  const styles = {
-    container: {
-      backgroundColor: currentTheme.background,
-      color: currentTheme.text,
-    },
-    card: {
-      backgroundColor: `rgba(${currentTheme.primary
-        .match(/\d+/g)
-        .map((n) => Math.min(parseInt(n) + 20, 255))
-        .join(", ")}, 0.1)`,
-      borderColor: currentTheme.border,
-    },
-    title: {
-      color: currentTheme.accent,
-    },
-    uploadArea: {
-      borderColor: isDragging ? currentTheme.accent : currentTheme.border,
-      backgroundColor: `rgba(${currentTheme.primary
-        .match(/\d+/g)
-        .join(", ")}, 0.1)`,
-    },
-    button: {
-      backgroundColor: currentTheme.accent,
-      color: currentTheme.text,
-    },
-    select: {
-      backgroundColor: `rgba(${currentTheme.primary
-        .match(/\d+/g)
-        .join(", ")}, 0.2)`,
-      borderColor: currentTheme.border,
-      color: currentTheme.text,
-    },
-    canvas: {
-      borderColor: currentTheme.border,
-      backgroundColor: `rgba(${currentTheme.primary
-        .match(/\d+/g)
-        .join(", ")}, 0.1)`,
-    },
   };
 
   const handleDragOver = (e) => {
@@ -221,12 +253,12 @@ const PixelArtConverter = () => {
   };
 
   return (
-    <div className="min-h-screen" style={styles.container}>
+    <div style={styles.container}>
       <div className="max-w-4xl mx-auto p-6 space-y-6">
         <div className="rounded-lg shadow-xl p-6" style={styles.card}>
           <h1
             className="text-3xl font-bold mb-6 text-center"
-            style={styles.title}
+            style={styles.text.primary}
           >
             Pixelize
           </h1>
@@ -244,21 +276,17 @@ const PixelArtConverter = () => {
               >
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                   {image ? (
-                    <ImageIcon
-                      className="w-10 h-10 mb-3"
-                      style={{ color: currentTheme.accent }}
-                    />
+                    <ImageIcon className="w-10 h-10 mb-3" style={styles.icon} />
                   ) : (
-                    <Upload
-                      className="w-10 h-10 mb-3"
-                      style={{ color: currentTheme.accent }}
-                    />
+                    <Upload className="w-10 h-10 mb-3" style={styles.icon} />
                   )}
-                  <p className="mb-2 text-sm">
+                  <p className="mb-2 text-sm" style={styles.text.primary}>
                     <span className="font-semibold">Click to upload</span> or
                     drag and drop
                   </p>
-                  <p className="text-xs opacity-70">PNG, JPG, WEBP</p>
+                  <p className="text-xs" style={styles.text.secondary}>
+                    PNG, JPG, WEBP
+                  </p>
                 </div>
                 <input
                   type="file"
@@ -270,7 +298,10 @@ const PixelArtConverter = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium">
+              <label
+                className="block text-sm font-medium"
+                style={styles.text.primary}
+              >
                 Pixel Scale: {(scale * 100).toFixed(1)}%
               </label>
               <input
@@ -281,24 +312,20 @@ const PixelArtConverter = () => {
                 value={scale}
                 onChange={handleScaleChange}
                 className="w-full"
-                style={{ accentColor: currentTheme.accent }}
+                style={styles.slider}
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium">Color Palette</label>
-              <select
+              <StyledSelect
                 value={selectedPalette}
                 onChange={handlePaletteChange}
-                className="block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none"
-                style={styles.select}
-              >
-                {Object.keys(colorPalettes).map((palette) => (
-                  <option key={palette} value={palette}>
-                    {palette.charAt(0).toUpperCase() + palette.slice(1)}
-                  </option>
-                ))}
-              </select>
+                options={Object.keys(colorPalettes).map((palette) => ({
+                  value: palette,
+                  label: palette.charAt(0).toUpperCase() + palette.slice(1),
+                }))}
+                currentTheme={currentTheme}
+              />
             </div>
           </div>
 
